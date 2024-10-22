@@ -16,18 +16,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.algorandfoundation.xhdwalletapi.XHDWalletAPIAndroid
-import com.algorandfoundation.xhdwalletapi.KeyContext
 import cash.z.ecc.android.bip39.Mnemonics
 import cash.z.ecc.android.bip39.Mnemonics.MnemonicCode
 import cash.z.ecc.android.bip39.toSeed
 import com.algorand.algosdk.crypto.Address
+import com.algorand.algosdk.crypto.Signature
+import com.algorand.algosdk.transaction.SignedTransaction
 import com.algorand.algosdk.transaction.Transaction
 import com.algorand.algosdk.util.Encoder
 import com.algorand.algosdk.v2.client.common.AlgodClient
-import com.algorand.algosdk.crypto.Signature
-import com.algorand.algosdk.transaction.SignedTransaction
 import com.algorandfoundation.arc52_android_wallet.databinding.WalletBinding
+import io.github.hashmapsdata2value.xhdwalletapi.KeyContext
+import io.github.hashmapsdata2value.xhdwalletapi.XHDWalletAPIAndroid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -69,7 +69,7 @@ class Wallet : Fragment() {
                                                     parseTextInput(binding.changeNumberEditText),
                                                     parseTextInput(binding.keyindexNumberEditText)
                                             ),
-                                xHDWalletAPI = xHDWalletAPI
+                                    xHDWalletAPI = xHDWalletAPI
                             )
                             viewModel.isProgrammaticChange = false
                         }
@@ -144,7 +144,7 @@ class Wallet : Fragment() {
                                                     parseTextInput(binding.changeNumberEditText),
                                                     parseTextInput(binding.keyindexNumberEditText)
                                             ),
-                                xHDWalletAPI = xHDWalletAPI
+                                    xHDWalletAPI = xHDWalletAPI
                             )
                         } else {
                             // The seed phrase is invalid
@@ -208,7 +208,7 @@ class Wallet : Fragment() {
                                                 parseTextInput(binding.changeNumberEditText),
                                                 parseTextInput(binding.keyindexNumberEditText)
                                         ),
-                            xHDWalletAPI = xHDWalletAPI
+                                xHDWalletAPI = xHDWalletAPI
                         )
                     }
 
@@ -264,7 +264,7 @@ class Wallet : Fragment() {
                                 .lookupParams(algoDClient) // lookup fee, firstValid, lastValid
                                 .sender(
                                         Address(
-                                            xHDWalletAPI?.keyGen(KeyContext.Address, 0u, 0u, 0u)
+                                                xHDWalletAPI?.keyGen(KeyContext.Address, 0u, 0u, 0u)
                                         )
                                 )
                                 .receiver(receiverAddress)
@@ -272,22 +272,25 @@ class Wallet : Fragment() {
                                 .noteUTF8(note)
                                 .build()
 
-                val pkAddress = Address(xHDWalletAPI?.keyGen(
-                    KeyContext.Address,
-                    0u,
-                    0u,
-                    0u,
-                ))
-                val txSig =
-                    Signature(
-                        xHDWalletAPI?.signAlgoTransaction(
-                            KeyContext.Address,
-                            0u,
-                            0u,
-                            0u,
-                            tx.bytesToSign()
+                val pkAddress =
+                        Address(
+                                xHDWalletAPI?.keyGen(
+                                        KeyContext.Address,
+                                        0u,
+                                        0u,
+                                        0u,
+                                )
                         )
-                    )
+                val txSig =
+                        Signature(
+                                xHDWalletAPI?.signAlgoTransaction(
+                                        KeyContext.Address,
+                                        0u,
+                                        0u,
+                                        0u,
+                                        tx.bytesToSign()
+                                )
+                        )
 
                 val stx = SignedTransaction(tx, txSig, tx.txID())
 
@@ -358,7 +361,7 @@ class WalletViewModel : ViewModel() {
         // Produce the PK and turn it into an Algorand formatted address
         val algoAddress =
                 Address(
-                    xHDWalletAPI.keyGen(
+                        xHDWalletAPI.keyGen(
                                 keyContext,
                                 numbers[0].toUInt(),
                                 numbers[1].toUInt(),
